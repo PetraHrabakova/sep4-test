@@ -61,6 +61,8 @@ jobs:
         working-directory: ./ci_cd_backup_files
         if: success()
         run: |
+          gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
+          gcloud auth activate-service-account --key-file=${{ secrets.GCP_SA_KEY }}
           gcloud container clusters get-credentials sep4-backend-cluster --zone=us-central1-a
           kubectl apply -f ./k8s-deployment.yaml
       - name: Ping URLs
