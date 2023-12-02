@@ -58,7 +58,7 @@ jobs:
         run: docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/garbage-backend-test:latest
 
       - name: Deploy to Google Kubernetes Engine
-        working-directory: ./ci_cd_backup_files
+        working-directory: cicd_backup_files
         if: success()
         run: |
           gcloud container clusters get-credentials sep4-backend-cluster --zone=us-central1-a
