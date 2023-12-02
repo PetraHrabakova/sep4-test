@@ -57,10 +57,13 @@ jobs:
       - name: Push image to GKE
         run: docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/garbage-backend-test:latest
 
+      - name: Install Cloud Authentication Plugin
+        run: gcloud components install gke-gcloud-auth-plugin
+
       - name: Deploy to Google Kubernetes Engine
         if: success()
         run: |
-          gcloud container clusters get-credentials sep4-backend-cluster --zone=us-central1-a --project ${{ secrets.GCP_PROJECT_ID }}
+          gcloud container clusters get-credentials sep4-backend-cluster --zone=us-central1-a
           kubectl apply -f ./k8s-deployment.yaml
       - name: Ping URLs
         run: |
