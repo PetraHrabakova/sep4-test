@@ -1,0 +1,72 @@
+name: Main Branch Push or Pull request - Create main image and deploy to Google Kubernetes Engine
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v2
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Build with Maven and Run tests
+        run: mvn clean package
+
+      - name: Build Docker Image
+        if: success()
+        run: docker build -t petrahrab/garbage-backend-test:latest .
+
+      - name: Log in to Docker Hub
+        if: success()
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Push to Docker Hub
+        run: docker push petrahrab/garbage-backend-test:latest
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0.2.0
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+
+      - name: Configure Docker for GKE
+        run: gcloud auth configure-docker
+
+      - name: Pull image from Docker Hub
+        run: |
+          docker pull petrahrab/garbage-backend-test:latest
+
+      - name: Tag image for GKE
+        if: success()
+        run: docker tag petrahrab/garbage-backend-test:latest gcr.io/${{ secrets.GCP_PROJECT_ID }}/garbage-backend-test:latest
+
+      - name: Push image to GKE
+        run: docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/garbage-backend-test:latest
+
+      - name: Deploy to Google Kubernetes Engine
+        working-directory: ./ci_cd_backup_files
+        if: success()
+        run: |
+          gcloud container clusters get-credentials sep4-backend-cluster --zone=us-central1-a
+          kubectl apply -f ./k8s-deployment.yaml
+      - name: Ping URLs
+        run: |
+          curl -i http://34.28.70.61:2910/
+          curl -i http://35.232.53.148:8080/    
+          
+
+
