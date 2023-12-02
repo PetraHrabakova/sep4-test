@@ -64,8 +64,11 @@ jobs:
       - name: Deploy to Google Kubernetes Engine
         if: success()
         run: |
-          gcloud auth activate-service-account --key-file=service-account-key.json
-          gcloud container clusters get-credentials sep4-backend-cluster --zone=us-central1-a
+          gcloud container clusters get-credentials sep4-backend-cluster \
+            --zone=us-central1-a \
+            --allow-unauthenticated \
+            --service-account 416813802480-compute@developer.gserviceaccount.com
+          
           kubectl apply -f ./k8s-deployment.yaml
       - name: Ping URLs
         run: |
