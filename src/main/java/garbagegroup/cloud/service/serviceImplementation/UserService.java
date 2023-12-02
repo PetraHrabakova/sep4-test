@@ -7,7 +7,6 @@ import garbagegroup.cloud.jwt.auth.AuthenticationResponse;
 import garbagegroup.cloud.model.User;
 import garbagegroup.cloud.repository.IUserRepository;
 import garbagegroup.cloud.service.serviceInterface.IUserService;
-import jakarta.validation.constraints.Null;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
