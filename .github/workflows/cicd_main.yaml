@@ -70,7 +70,6 @@ jobs:
 
       - name: Ping URLs
         run: |
-          curl -i http://34.28.70.61:2910/
           curl -i http://35.232.53.148:8080/    
           
 
