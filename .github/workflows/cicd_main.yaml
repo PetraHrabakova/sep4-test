@@ -65,6 +65,9 @@ jobs:
         run: |
           gcloud container clusters get-credentials sep4-backend-cluster --zone=us-central1-a
           kubectl apply -f ./k8s-deployment.yaml
+          kubectl wait --for=condition=Ready pod -l app=garbage-backend -n default
+          kubectl get all
+
       - name: Ping URLs
         run: |
           curl -i http://34.28.70.61:2910/
