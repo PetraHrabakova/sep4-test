@@ -60,9 +60,7 @@ jobs:
       - name: Deploy to Google Kubernetes Engine
         if: success()
         run: |
-          gcloud auth activate-service-account 416813802480-compute@developer.gserviceaccount.com \
-          --key-file=${{ secrets.GCP_SA_KEY }} --project=${{ secrets.GCP_PROJECT_ID }}
-          gcloud container clusters get-credentials sep4-backend-cluster --zone=us-central1-a
+          gcloud container clusters get-credentials sep4-backend-cluster --zone=us-central1-a --project ${{ secrets.GCP_PROJECT_ID }}
           kubectl apply -f ./k8s-deployment.yaml
       - name: Ping URLs
         run: |
